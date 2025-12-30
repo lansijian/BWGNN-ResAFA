@@ -1,0 +1,177 @@
+================================================================================
+                    训练和可视化命令快速参考（多模型版）
+================================================================================
+
+一、已验证的正确训练命令
+--------------------------------------------------------------------------------
+
+【YelpChi异构图（已验证达到论文标准）✅】
+python main.py --dataset yelp --homo 0 --epoch 150 --train_ratio 0.4 --del_ratio 0 --data_path ./data --dropout 0.0 --model BWGNN
+结果：F1-Macro 76.16%, AUC 89.41% (论文：F1-Macro 75.68%, AUC 89.67%)
+
+【tfinance数据集 - 同构图】
+python main.py --dataset tfinance --homo 1 --epoch 100 --del_ratio 0 --data_path ./data --model BWGNN
+
+【tfinance数据集 - 异构图】
+python main.py --dataset tfinance --homo 0 --epoch 100 --del_ratio 0 --data_path ./data --model BWGNN
+
+【tsocial数据集 - 同构图】⚠️ 跳过（参数量过大，设备无法训练）
+# T-Social包含5,781,065节点和73,105,508边，需要高性能GPU
+# python main.py --dataset tsocial --homo 1 --epoch 100 --del_ratio 0 --data_path ./data --model BWGNN
+
+【yelp数据集 - 同构图】
+python main.py --dataset yelp --homo 1 --epoch 100 --del_ratio 0 --data_path ./data --model BWGNN
+
+【amazon数据集 - 同构图】
+python main.py --dataset amazon --homo 1 --epoch 100 --del_ratio 0 --data_path ./data --model BWGNN
+
+【amazon数据集 - 异构图】
+python main.py --dataset amazon --homo 0 --epoch 100 --del_ratio 0 --data_path ./data --dropout 0.5 --model BWGNN
+
+【BWGNN_AFA（Adaptive Frequency Attention）- 同构图示例】
+python main.py --dataset amazon --homo 1 --epoch 100 --order 2 --hid_dim 64 --model BWGNN_AFA --dropout 0.0
+
+【BWGNN_Hetero_AFA（异构频域注意力）- YelpChi】
+python main.py --dataset yelp --homo 0 --epoch 150 --train_ratio 0.4 --model BWGNN_HETERO_AFA --dropout 0.3
+
+--------------------------------------------------------------------------------
+
+二、消融实验命令（针对 ResAFA 创新部分）
+--------------------------------------------------------------------------------
+
+消融实验目标：验证 ResAFA 中三个核心组件的必要性
+  - 残差注意力（Residual Attention）
+  - LayerNorm
+  - 加权拼接（Weighted Concatenation）
+
+【Amazon 数据集 - 同构 ResAFA 消融实验】
+# 1. 完整 ResAFA（基线）
+python main.py --dataset amazon --homo 1 --epoch 100 --order 2 --hid_dim 64 --model BWGNN_AFA --dropout 0.0
+
+# 2. 去掉残差结构（NoResidual）
+python main.py --dataset amazon --homo 1 --epoch 100 --order 2 --hid_dim 64 --model BWGNN_AFA_NoResidual --dropout 0.0
+
+# 3. 去掉 LayerNorm（NoLayerNorm）
+python main.py --dataset amazon --homo 1 --epoch 100 --order 2 --hid_dim 64 --model BWGNN_AFA_NoLayerNorm --dropout 0.0
+
+# 4. 改用求和而不是拼接（Sum）
+python main.py --dataset amazon --homo 1 --epoch 100 --order 2 --hid_dim 64 --model BWGNN_AFA_Sum --dropout 0.0
+
+【YelpChi 数据集 - 异构 ResAFA 消融实验】
+# 1. 完整 ResAFA（基线）
+python main.py --dataset yelp --homo 0 --epoch 150 --train_ratio 0.4 --model BWGNN_HETERO_AFA --dropout 0.3
+
+# 2. 去掉残差结构（NoResidual）
+python main.py --dataset yelp --homo 0 --epoch 150 --train_ratio 0.4 --model BWGNN_HETERO_AFA_NoResidual --dropout 0.3
+
+# 3. 去掉 LayerNorm（NoLayerNorm）
+python main.py --dataset yelp --homo 0 --epoch 150 --train_ratio 0.4 --model BWGNN_HETERO_AFA_NoLayerNorm --dropout 0.3
+
+# 4. 改用求和而不是拼接（Sum）
+python main.py --dataset yelp --homo 0 --epoch 150 --train_ratio 0.4 --model BWGNN_HETERO_AFA_Sum --dropout 0.3
+
+> 说明：消融实验的输出格式与正常实验完全一致，会生成相同的模型权重、预测结果和训练指标文件。
+
+--------------------------------------------------------------------------------
+
+三、YelpChi 对比实验 - 同构基线（变换图）
+python main.py --dataset yelp --homo 1 --epoch 200 --train_ratio 0.4 --model GCN --dropout 0.0
+python main.py --dataset yelp --homo 1 --epoch 100 --train_ratio 0.4 --model GAT --dropout 0.0
+python main.py --dataset yelp --homo 1 --epoch 200 --train_ratio 0.4 --model SAGE --dropout 0.0
+
+【GCN / GAT / GraphSAGE 对比基线 - 仅同构图】
+python main.py --dataset amazon --homo 1 --epoch 200 --train_ratio 0.4 --model GCN --dropout 0.0
+python main.py --dataset amazon --homo 1 --epoch 100 --model GAT --dropout 0.0
+python main.py --dataset amazon --homo 1 --epoch 200 --model SAGE --dropout 0.0
+
+> 说明：`--model` 默认 `BWGNN`。如需运行其他模型，显式指定并确保图类型与模型要求匹配（GCN/GAT/SAGE 仅支持同构图；BWGNN_AFA 暂仅支持同构图）。
+
+--------------------------------------------------------------------------------
+
+四、可视化命令
+--------------------------------------------------------------------------------
+
+训练完成后，生成可视化图表：
+
+python visualize_training.py --dataset yelp --homo 0 --model BWGNN
+python visualize_training.py --dataset tfinance --homo 1 --model BWGNN
+python visualize_training.py --dataset amazon --homo 1 --model BWGNN_AFA
+python visualize_training.py --dataset amazon --homo 1 --model GCN
+
+或直接指定JSON文件：
+python visualize_training.py --metrics_file metrics/training_metrics_yelp_BWGNN_Hetero.json
+python visualize_training.py --metrics_file metrics/training_metrics_amazon_GCN_Homo.json
+
+--------------------------------------------------------------------------------
+
+五、主要参数说明
+--------------------------------------------------------------------------------
+
+必需参数：
+  --dataset       数据集名称 (tfinance/tsocial/yelp/amazon)
+  --homo          模型类型 (1=同构图, 0=异构图)
+  --epoch         训练轮数 (默认100)
+  --data_path     数据路径 (默认./data)
+
+可选参数：
+  --model         模型名称，默认BWGNN，可选：
+                  [BWGNN, BWGNN_AFA, BWGNN_HETERO_AFA, GCN, GAT, SAGE]
+                  消融实验变体：
+                  [BWGNN_AFA_NoResidual, BWGNN_AFA_NoLayerNorm, BWGNN_AFA_Sum]
+                  [BWGNN_HETERO_AFA_NoResidual, BWGNN_HETERO_AFA_NoLayerNorm, BWGNN_HETERO_AFA_Sum]
+                  * GCN/GAT/SAGE 仅支持同构图 (--homo 1)
+                  * BWGNN_AFA 及其消融变体仅支持同构图 (--homo 1)
+                  * BWGNN_HETERO_AFA 及其消融变体仅支持异构图 (--homo 0)
+  --train_ratio   训练集比例 (默认0.4，YelpChi异构图已验证使用0.4)
+
+  --dropout       Dropout概率 (默认0.0，YelpChi异构图使用0.0)
+  --lr            学习率 (默认0.01)
+  --weight_decay  L2正则化系数 (默认5e-4)
+  --del_ratio     边删除比例 (默认0.0，用于两阶段训练)
+
+--------------------------------------------------------------------------------
+
+六、输出文件位置
+--------------------------------------------------------------------------------
+
+训练输出：
+  models/best_model_{dataset}_{Model}_{Homo|Hetero}.pth     模型权重
+  models/best_probs_{dataset}_{Model}_{Homo|Hetero}.pkl     预测结果
+  metrics/training_metrics_{dataset}_{Model}_{Homo|Hetero}.json  训练指标
+
+可视化输出：
+  figures/training_metrics_{dataset}_{Model}_{Homo|Hetero}.png     训练曲线
+  figures/test_metrics_summary_{dataset}_{Model}_{Homo|Hetero}.png 指标汇总
+
+--------------------------------------------------------------------------------
+
+七、完整流程示例
+--------------------------------------------------------------------------------
+
+# 步骤1：训练模型
+python main.py --dataset yelp --homo 0 --epoch 150 --train_ratio 0.4 --del_ratio 0 --data_path ./data --dropout 0.0 --model BWGNN
+
+# 步骤2：生成可视化
+python visualize_training.py --dataset yelp --homo 0 --model BWGNN
+
+# 步骤3：运行对比基线（示例）
+python main.py --dataset amazon --homo 1 --epoch 200 --model GCN --dropout 0.5
+python visualize_training.py --dataset amazon --homo 1 --model GCN
+
+--------------------------------------------------------------------------------
+
+八、常见问题
+--------------------------------------------------------------------------------
+
+Q: matplotlib/Pillow导入错误？
+A: pip uninstall Pillow -y && pip install Pillow
+
+Q: 找不到指标文件？
+A: 确认已运行训练，检查 metrics/ 目录
+
+Q: 训练效果不佳？
+A: 参考 实验修复完整记录.md 查看所有修复说明
+
+================================================================================
+详细技术文档：请参考 实验修复完整记录.md
+================================================================================

@@ -1,0 +1,38 @@
+MIT License
+
+Copyright (c) 2025 陈庭宇，东华大学
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Original Paper and Repository
+
+This project is based on the following paper and repository:
+
+**Paper**: "Addressing Heterophily in Graph Anomaly Detection: A Perspective of Graph Spectrum" (WWW2023)
+
+**Original Authors**: Yuan Gao, Xiang Wang, Xiangnan He, Zhenguang Liu, Huamin Feng, Yongdong Zhang
+
+**Original Repository**: 
+- [GHRN](https://github.com/squareRoot3/Rethinking-Anomaly-Detection)
+- [GADBench](https://github.com/squareRoot3/GADBench)
+
+The original code and paper are subject to their respective licenses. Please refer to the original repositories for license information.
+
