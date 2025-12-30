@@ -46,9 +46,9 @@ data/*.mat
 data/tfinance/*
 data/tsocial/*
 
-# Results and metrics (can be regenerated)
-metrics/*.json
-figures/*.png
+# Results and metrics (now included in repository)
+# metrics/*.json
+# figures/*.png
 result.txt
 
 # Logs

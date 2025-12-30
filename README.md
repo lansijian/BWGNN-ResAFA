@@ -21,6 +21,26 @@
 **作者**: 陈庭宇，东华大学
 
 本项目复现了BWGNN (Bilinear Weisfeiler-Lehman Graph Neural Network) 方法，实现了图异常检测的核心功能：
+
+### 模型架构
+
+#### 原始 BWGNN 架构
+
+![BWGNN Architecture](BWGNN.png)
+
+#### BWGNN-ResAFA 创新架构对比
+
+![BWGNN-ResAFA vs BWGNN](BWGNN-ResAFA%20VS%20BWGNN.png)
+
+**关键改进**：
+- ✅ **残差连接**：保留原始特征，避免信息丢失
+- ✅ **LayerNorm**：稳定训练过程中的特征分布
+- ✅ **加权拼接**：保留所有频率信息，避免信息瓶颈
+- ✅ **异常信号放大**：相比原始 BWGNN，异常信号放大 3.2 倍
+
+**核心创新**：ResAFA（Residual Adaptive Frequency Attention）模块通过残差连接、LayerNorm 和加权拼接，有效放大异常信号，解决了原始 BWGNN 中"弱信号被淹没"的问题。
+
+**项目功能**：
 - ✅ 模型训练与权重保存（已修复所有关键问题）
 - ✅ 评估指标可视化
 - ✅ 支持同构/异构两种图模型
@@ -81,6 +101,38 @@
 - ✅ **加权拼接**：相比求和策略，在保留频率信息方面具有明显优势，异构场景中差异更显著（YelpChi AUC 下降 3.16%）
 
 详细分析请参考 [`README_Experiment.md`](README_Experiment.md) 的消融实验部分。
+
+### 实验结果可视化
+
+#### Amazon 数据集 - ResAFA 完整模型训练曲线
+
+![Amazon ResAFA Training](figures/training_metrics_amazon_BWGNN_AFA_Homo.png)
+
+![Amazon ResAFA Test Metrics](figures/test_metrics_summary_amazon_BWGNN_AFA_Homo.png)
+
+#### YelpChi 数据集 - ResAFA 异构模型训练曲线
+
+![YelpChi ResAFA Training](figures/training_metrics_yelp_BWGNN_HETERO_AFA_Hetero.png)
+
+![YelpChi ResAFA Test Metrics](figures/test_metrics_summary_yelp_BWGNN_HETERO_AFA_Hetero.png)
+
+#### 消融实验可视化对比
+
+**Amazon 数据集消融实验：**
+
+| 变体 | 训练曲线 | 测试指标汇总 |
+|:---:|:---:|:---:|
+| NoResidual | ![Amazon NoResidual Training](figures/training_metrics_amazon_BWGNN_AFA_NoResidual_Homo.png) | ![Amazon NoResidual Test](figures/test_metrics_summary_amazon_BWGNN_AFA_NoResidual_Homo.png) |
+| NoLayerNorm | ![Amazon NoLayerNorm Training](figures/training_metrics_amazon_BWGNN_AFA_NoLayerNorm_Homo.png) | ![Amazon NoLayerNorm Test](figures/test_metrics_summary_amazon_BWGNN_AFA_NoLayerNorm_Homo.png) |
+| Sum | ![Amazon Sum Training](figures/training_metrics_amazon_BWGNN_AFA_Sum_Homo.png) | ![Amazon Sum Test](figures/test_metrics_summary_amazon_BWGNN_AFA_Sum_Homo.png) |
+
+**YelpChi 数据集消融实验：**
+
+| 变体 | 训练曲线 | 测试指标汇总 |
+|:---:|:---:|:---:|
+| NoResidual | ![YelpChi NoResidual Training](figures/training_metrics_yelp_BWGNN_HETERO_AFA_NoResidual_Hetero.png) | ![YelpChi NoResidual Test](figures/test_metrics_summary_yelp_BWGNN_HETERO_AFA_NoResidual_Hetero.png) |
+| NoLayerNorm | ![YelpChi NoLayerNorm Training](figures/training_metrics_yelp_BWGNN_HETERO_AFA_NoLayerNorm_Hetero.png) | ![YelpChi NoLayerNorm Test](figures/test_metrics_summary_yelp_BWGNN_HETERO_AFA_NoLayerNorm_Hetero.png) |
+| Sum | ![YelpChi Sum Training](figures/training_metrics_yelp_BWGNN_HETERO_AFA_Sum_Hetero.png) | ![YelpChi Sum Test](figures/test_metrics_summary_yelp_BWGNN_HETERO_AFA_Sum_Hetero.png) |
 
 ### 模型创新记录
 - 2025-11-26（AFA-v2，加权求和）：引入注意力后的频率压缩导致信息瓶颈，Amazon AUC 从 98.16% 降至 96.61%。
